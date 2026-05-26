@@ -2,9 +2,9 @@
 
 A Node.js REST API for managing contract data using Express.js with PostgreSQL.
 
-> Note: PRs on this repository are reviewed in parallel by a swarm of
-> specialist Claude agents covering Postgres, TypeScript, Docker,
-> security, and documentation. See `.github/workflows/claude-review.yml`.
+> Note: PRs on this repository are reviewed by a Claude agent covering
+> Postgres, TypeScript, Docker, security, and documentation in a single
+> review. See `.github/workflows/claude-review.yml`.
 
 - [Contract Data API](#contract-data-api)
   - [API Design Doc](#api-design-doc)
