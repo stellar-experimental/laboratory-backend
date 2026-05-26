@@ -54,10 +54,10 @@ jobs:
       - uses: anthropics/claude-code-action@20c8abf165d5f85ab3fc970db9498436377dc9d1 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Maintains a single tracking comment with progress and pulls in
+          # full PR context (comments, attachments). The review summary and
+          # inline comments are posted by the agent itself (see prompt).
           track_progress: true
-          # Consolidate the summary into a single comment that updates in
-          # place across re-runs, instead of stacking a new one per push.
-          use_sticky_comment: true
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -140,4 +140,4 @@ jobs:
           claude_args: |
             --model claude-haiku-4-5
             --max-turns 40
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment ${{ github.event.pull_request.number }}:*),Bash(gh pr diff ${{ github.event.pull_request.number }}:*),Bash(gh pr view ${{ github.event.pull_request.number }}:*),Bash(git log:*),Bash(git blame:*),Bash(git show:*),Bash(rg:*),Bash(cat:*),Bash(ls:*),Bash(find:*)"
+            --allowedTools "Skill,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment ${{ github.event.pull_request.number }}:*),Bash(gh pr diff ${{ github.event.pull_request.number }}:*),Bash(gh pr view ${{ github.event.pull_request.number }}:*),Bash(git log:*),Bash(git blame:*),Bash(git show:*),Bash(rg:*),Bash(cat:*),Bash(ls:*),Bash(find:*)"
