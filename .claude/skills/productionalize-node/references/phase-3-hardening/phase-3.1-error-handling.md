@@ -12,32 +12,39 @@ Create `src/errors.ts` (or similar, matching project structure):
 
 ```typescript
 export class AppError extends Error {
-  readonly statusCode: number
-  readonly details: Record<string, unknown>
+  readonly statusCode: number;
+  readonly details: Record<string, unknown>;
 
-  constructor(message: string, statusCode = 500, details: Record<string, unknown> = {}) {
-    super(message)
-    this.name = this.constructor.name
-    this.statusCode = statusCode
-    this.details = details
+  constructor(
+    message: string,
+    statusCode = 500,
+    details: Record<string, unknown> = {},
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    this.statusCode = statusCode;
+    this.details = details;
   }
 }
 
 export class ValidationError extends AppError {
   constructor(message: string, details: Record<string, unknown> = {}) {
-    super(message, 400, details)
+    super(message, 400, details);
   }
 }
 
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string) {
-    super(`${resource}${id ? ` '${id}'` : ''} not found`, 404, { resource, id })
+    super(`${resource}${id ? ` '${id}'` : ""} not found`, 404, {
+      resource,
+      id,
+    });
   }
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message = 'Unauthorized') {
-    super(message, 401)
+  constructor(message = "Unauthorized") {
+    super(message, 401);
   }
 }
 ```
@@ -47,20 +54,21 @@ Adapt the hierarchy to the project's domain. Don't over-engineer — start with 
 ### 2. Add Express error handler (if applicable)
 
 ```typescript
-import type { ErrorRequestHandler } from 'express'
+import type { ErrorRequestHandler } from "express";
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  const statusCode = err instanceof AppError ? err.statusCode : 500
-  const message = err instanceof AppError ? err.message : 'Internal Server Error'
+  const statusCode = err instanceof AppError ? err.statusCode : 500;
+  const message =
+    err instanceof AppError ? err.message : "Internal Server Error";
 
   // Log the full error for debugging
-  logger.error({ err, statusCode }, message)
+  logger.error({ err, statusCode }, message);
 
   // Don't leak internal errors to clients
   res.status(statusCode).json({
     error: { message, ...(err instanceof AppError ? err.details : {}) },
-  })
-}
+  });
+};
 ```
 
 ### 3. Scan and fix error handling patterns
@@ -78,15 +86,15 @@ Search the codebase for these anti-patterns and fix them:
 In the application entry point:
 
 ```typescript
-process.on('unhandledRejection', (reason) => {
-  logger.error({ reason }, 'Unhandled promise rejection')
-  process.exit(1)
-})
+process.on("unhandledRejection", reason => {
+  logger.error({ reason }, "Unhandled promise rejection");
+  process.exit(1);
+});
 
-process.on('uncaughtException', (err) => {
-  logger.error({ err }, 'Uncaught exception')
-  process.exit(1)
-})
+process.on("uncaughtException", err => {
+  logger.error({ err }, "Uncaught exception");
+  process.exit(1);
+});
 ```
 
 ## Verification

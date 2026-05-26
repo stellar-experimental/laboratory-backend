@@ -9,11 +9,13 @@ Evaluate whether the application needs CORS configuration, and set it up correct
 ## Decision Criteria
 
 CORS is needed if ANY of these are true:
+
 - The API is consumed by a browser-based frontend on a different origin
 - The API is a public API that third-party websites may call
 - The app serves both a frontend and an API from different origins/ports
 
 CORS is NOT needed if:
+
 - The API is only consumed by server-side clients (other services, CLI tools)
 - The frontend and API are served from the same origin
 - The app is behind a reverse proxy that handles CORS
@@ -37,15 +39,17 @@ pnpm add -D @types/cors
 ```
 
 ```typescript
-import cors from 'cors'
+import cors from "cors";
 
-app.use(cors({
-  origin: env.CORS_ORIGIN, // Add to env.ts
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 86400, // 24 hours preflight cache
-}))
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN, // Add to env.ts
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    maxAge: 86400, // 24 hours preflight cache
+  }),
+);
 ```
 
 Add `CORS_ORIGIN` to `env.ts` and `.env.example`.
@@ -53,6 +57,7 @@ Add `CORS_ORIGIN` to `env.ts` and `.env.example`.
 ### 3. If CORS is NOT needed
 
 Document the decision:
+
 ```typescript
 // CORS is intentionally not configured.
 // This API is consumed only by server-side clients.

@@ -5,6 +5,7 @@ Depends on all previous phases. This is the last phase.
 ## 8a: Code Review
 
 If a code review skill is available, invoke it with:
+
 - What was implemented: "Productionalization of a vibe-coded Node.js project"
 - Plan: reference `docs/vibe-to-production-plan.md`
 - Scope: all files changed since the skill started
@@ -26,6 +27,7 @@ Fix any issues found.
 ## 8b: Security Review
 
 If a security review skill is available, invoke it with a focus on:
+
 - OWASP Top 10 compliance
 - Dependency supply chain security
 - Secrets management
@@ -52,21 +54,21 @@ Fix any issues found.
 
 Evaluate all 13 criteria. ALL must pass before declaring the transformation complete.
 
-| # | Criterion | How to verify |
-|---|---|---|
-| 1 | TypeScript strict — zero type errors | `pnpm run check:types` exits 0 |
-| 2 | ESLint — zero errors | `pnpm run lint` exits 0 |
-| 3 | Prettier — fully formatted | `pnpm run format:check` exits 0 |
-| 4 | Tests pass with ≥ target coverage | `pnpm test -- --run --coverage` |
-| 5 | Build succeeds | `pnpm run build` exits 0 |
-| 6 | No CVEs in dependencies | `pnpm audit --audit-level=moderate` exits 0 |
-| 7 | No dependency newer than 1 week | `pnpm run check:deps-freshness` exits 0 |
-| 8 | All process.env replaced with validated env | `grep -rn "process\.env\." src/` returns 0 results (except env.ts) |
-| 9 | Security review passed | All security checklist items checked |
-| 10 | Code review passed | All code review items resolved |
-| 11 | README complete | Has install, usage, env vars, scripts, API docs |
-| 12 | Spec compliance (if --spec) | Compliance table shows no FAILs |
-| 13 | CI pipeline complete | `.github/workflows/ci.yml` runs all gates |
+| #   | Criterion                                   | How to verify                                                      |
+| --- | ------------------------------------------- | ------------------------------------------------------------------ |
+| 1   | TypeScript strict — zero type errors        | `pnpm run check:types` exits 0                                     |
+| 2   | ESLint — zero errors                        | `pnpm run lint` exits 0                                            |
+| 3   | Prettier — fully formatted                  | `pnpm run format:check` exits 0                                    |
+| 4   | Tests pass with ≥ target coverage           | `pnpm test -- --run --coverage`                                    |
+| 5   | Build succeeds                              | `pnpm run build` exits 0                                           |
+| 6   | No CVEs in dependencies                     | `pnpm audit --audit-level=moderate` exits 0                        |
+| 7   | No dependency newer than 1 week             | `pnpm run check:deps-freshness` exits 0                            |
+| 8   | All process.env replaced with validated env | `grep -rn "process\.env\." src/` returns 0 results (except env.ts) |
+| 9   | Security review passed                      | All security checklist items checked                               |
+| 10  | Code review passed                          | All code review items resolved                                     |
+| 11  | README complete                             | Has install, usage, env vars, scripts, API docs                    |
+| 12  | Spec compliance (if --spec)                 | Compliance table shows no FAILs                                    |
+| 13  | CI pipeline complete                        | `.github/workflows/ci.yml` runs all gates                          |
 
 ## Final Report
 

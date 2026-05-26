@@ -21,6 +21,7 @@ Check for these sections (all required for production):
 ### 2. Fix gaps
 
 For each missing section, add it. Pull information from:
+
 - `package.json` (scripts, description, license)
 - `env.ts` (environment variables)
 - Source code (API routes, exported functions)
@@ -29,6 +30,7 @@ For each missing section, add it. Pull information from:
 ### 3. Verify accuracy
 
 Every command in the README must actually work:
+
 - Copy each code block and run it
 - Verify install instructions produce a working setup
 - Verify the quick start example runs
@@ -58,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - TypeScript strict mode
 - Vitest test suite with X% coverage
 - ESLint + Prettier configuration
@@ -98,6 +101,7 @@ If `--spec` is a URL, fetch it. If it's a file path, read it.
 ### 2. Cross-reference
 
 For each requirement in the spec:
+
 - Find the corresponding implementation in the codebase
 - Verify the behavior matches
 - Document any deviations

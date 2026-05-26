@@ -39,6 +39,7 @@ Upgrade dependencies to the latest stable version that is NOT newer than 1 week 
 Create a CI + Makefile check that rejects dependencies newer than 1 week.
 
 1. Create `scripts/check-deps-freshness.js`:
+
    ```javascript
    #!/usr/bin/env node
 
@@ -47,30 +48,35 @@ Create a CI + Makefile check that rejects dependencies newer than 1 week.
     * This protects against supply chain attacks via compromised fresh packages.
     */
 
-   import { execSync } from 'node:child_process'
-   import { readFileSync } from 'node:fs'
+   import { execSync } from "node:child_process";
+   import { readFileSync } from "node:fs";
 
-   const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
+   const pkg = JSON.parse(readFileSync("package.json", "utf8"));
    const allDeps = {
      ...pkg.dependencies,
      ...pkg.devDependencies,
-   }
+   };
 
-   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
-   const now = Date.now()
-   const violations = []
+   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+   const now = Date.now();
+   const violations = [];
 
    for (const [name, version] of Object.entries(allDeps)) {
      try {
-       const raw = execSync(`npm view ${name} time --json`, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
-       const times = JSON.parse(raw)
-       const resolvedVersion = version.replace(/^[\^~>=<]*/g, '')
-       const publishDate = times[resolvedVersion]
+       const raw = execSync(`npm view ${name} time --json`, {
+         encoding: "utf8",
+         stdio: ["pipe", "pipe", "pipe"],
+       });
+       const times = JSON.parse(raw);
+       const resolvedVersion = version.replace(/^[\^~>=<]*/g, "");
+       const publishDate = times[resolvedVersion];
        if (publishDate) {
-         const age = now - new Date(publishDate).getTime()
+         const age = now - new Date(publishDate).getTime();
          if (age < ONE_WEEK_MS) {
-           const days = Math.floor(age / (24 * 60 * 60 * 1000))
-           violations.push(`${name}@${resolvedVersion} — published ${days} day(s) ago`)
+           const days = Math.floor(age / (24 * 60 * 60 * 1000));
+           violations.push(
+             `${name}@${resolvedVersion} — published ${days} day(s) ago`,
+           );
          }
        }
      } catch {
@@ -79,17 +85,18 @@ Create a CI + Makefile check that rejects dependencies newer than 1 week.
    }
 
    if (violations.length > 0) {
-     console.error('Dependencies newer than 1 week detected:')
-     violations.forEach((v) => console.error(`  - ${v}`))
-     process.exit(1)
+     console.error("Dependencies newer than 1 week detected:");
+     violations.forEach(v => console.error(`  - ${v}`));
+     process.exit(1);
    } else {
-     console.log('All dependencies are older than 1 week.')
+     console.log("All dependencies are older than 1 week.");
    }
    ```
 
 2. Make it executable: `chmod +x scripts/check-deps-freshness.js`
 
 3. Add to package.json scripts:
+
    ```json
    "check:deps-freshness": "node scripts/check-deps-freshness.js"
    ```

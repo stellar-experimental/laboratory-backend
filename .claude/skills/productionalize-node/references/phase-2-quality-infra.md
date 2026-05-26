@@ -8,24 +8,29 @@ Depends on Phase 1 (Foundation).
 
 1. Install: `pnpm add -D eslint @eslint/js typescript-eslint`
 2. Create `eslint.config.mjs`:
+
    ```js
-   import eslint from '@eslint/js'
-   import tseslint from 'typescript-eslint'
+   import eslint from "@eslint/js";
+   import tseslint from "typescript-eslint";
 
    export default tseslint.config(
      eslint.configs.recommended,
      ...tseslint.configs.recommended,
      {
        rules: {
-         '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-         '@typescript-eslint/no-explicit-any': 'warn',
+         "@typescript-eslint/no-unused-vars": [
+           "error",
+           { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+         ],
+         "@typescript-eslint/no-explicit-any": "warn",
        },
      },
      {
-       ignores: ['dist/', 'coverage/', 'node_modules/', '**/*.test.ts'],
-     }
-   )
+       ignores: ["dist/", "coverage/", "node_modules/", "**/*.test.ts"],
+     },
+   );
    ```
+
 3. Adjust rules based on the project's needs. Don't be overly strict on a first pass — `warn` for things the team can tighten later.
 
 ### Prettier
@@ -62,18 +67,21 @@ Depends on Phase 1 (Foundation).
 2. If only `console.log` is used:
    - Install pino: `pnpm add pino`
    - Create a logger module (e.g., `src/logger.ts`):
+
      ```typescript
-     import pino from 'pino'
+     import pino from "pino";
 
      export const logger = pino({
-       level: process.env.LOG_LEVEL ?? 'info',
-     })
+       level: process.env.LOG_LEVEL ?? "info",
+     });
      ```
+
    - Replace `console.log` calls with appropriate logger levels:
      - `console.log` → `logger.info`
      - `console.error` → `logger.error`
      - `console.warn` → `logger.warn`
      - Debug/trace output → `logger.debug`
+
 3. Do NOT replace console.log in test files or CLI scripts where stdout is the interface.
 4. Verify: application starts and produces structured JSON logs.
 

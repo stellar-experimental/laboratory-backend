@@ -37,6 +37,7 @@ No dependencies. This phase establishes the project's structural foundation.
 ## 1b: Package.json Scripts + Makefile
 
 1. Ensure these scripts exist in package.json:
+
    ```json
    {
      "scripts": {
@@ -50,9 +51,11 @@ No dependencies. This phase establishes the project's structural foundation.
      }
    }
    ```
+
    Adjust based on confirmed tooling (e.g., if user chose Jest over Vitest).
 
 2. Create a `Makefile` that mirrors the CI pipeline:
+
    ```makefile
    .PHONY: help check format lint types test build deps-audit deps-freshness
 
@@ -88,6 +91,7 @@ No dependencies. This phase establishes the project's structural foundation.
 ## 1c: .gitignore + Editor Configs
 
 1. Ensure `.gitignore` covers at minimum:
+
    ```
    node_modules/
    dist/
@@ -100,6 +104,7 @@ No dependencies. This phase establishes the project's structural foundation.
    ```
 
 2. Create `.editorconfig` if missing:
+
    ```ini
    root = true
 
@@ -123,6 +128,7 @@ No dependencies. This phase establishes the project's structural foundation.
 ## Verification
 
 After completing all sub-phases:
+
 - `pnpm run check:types` passes
 - `pnpm run build` succeeds
 - All source files are properly gitignored

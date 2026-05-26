@@ -15,19 +15,19 @@ pnpm add -D vitest @vitest/coverage-v8
 Create or update `vitest.config.ts`:
 
 ```typescript
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     globals: true,
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'lcov', 'html'],
-      include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/**/*.d.ts'],
+      provider: "v8",
+      reporter: ["text", "lcov", "html"],
+      include: ["src/**/*.ts"],
+      exclude: ["src/**/*.test.ts", "src/**/*.d.ts"],
     },
   },
-})
+});
 ```
 
 ### 3. Verify test infrastructure
@@ -36,13 +36,13 @@ Create a smoke test to verify the setup works:
 
 ```typescript
 // src/smoke.test.ts
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from "vitest";
 
-describe('test setup', () => {
-  it('works', () => {
-    expect(true).toBe(true)
-  })
-})
+describe("test setup", () => {
+  it("works", () => {
+    expect(true).toBe(true);
+  });
+});
 ```
 
 Run: `pnpm test -- --run`. Delete the smoke test after verifying.
@@ -50,6 +50,7 @@ Run: `pnpm test -- --run`. Delete the smoke test after verifying.
 ### 4. Colocate tests
 
 Follow the convention of placing test files next to source files:
+
 ```
 src/
   users/
@@ -81,6 +82,7 @@ Focus on the highest-value tests first:
 5. **Integration points** — database queries, external API calls (mock these)
 
 Do NOT waste time testing:
+
 - Simple getters/setters
 - Framework boilerplate
 - Third-party library internals
@@ -91,37 +93,41 @@ Do NOT waste time testing:
 If a TDD workflow skill is available, invoke it for writing new tests. Otherwise, follow this pattern:
 
 For each module:
+
 1. Write a test that exercises the happy path
 2. Write tests for each error/validation path
 3. Write tests for edge cases
 4. Mock external dependencies (database, APIs, file system)
 
 Test structure:
+
 ```typescript
-describe('createUser', () => {
-  it('creates a user with valid input', async () => {
+describe("createUser", () => {
+  it("creates a user with valid input", async () => {
     // Arrange
-    const input = { email: 'test@example.com', name: 'Test' }
+    const input = { email: "test@example.com", name: "Test" };
     // Act
-    const result = await createUser(input)
+    const result = await createUser(input);
     // Assert
-    expect(result).toMatchObject({ email: 'test@example.com' })
-  })
+    expect(result).toMatchObject({ email: "test@example.com" });
+  });
 
-  it('throws ValidationError for invalid email', async () => {
-    await expect(createUser({ email: 'invalid', name: 'Test' }))
-      .rejects.toThrow(ValidationError)
-  })
+  it("throws ValidationError for invalid email", async () => {
+    await expect(
+      createUser({ email: "invalid", name: "Test" }),
+    ).rejects.toThrow(ValidationError);
+  });
 
-  it('throws NotFoundError when referenced resource missing', async () => {
+  it("throws NotFoundError when referenced resource missing", async () => {
     // ...
-  })
-})
+  });
+});
 ```
 
 ### 4. Reach coverage target
 
 Run coverage after each batch of tests:
+
 ```bash
 pnpm test -- --run --coverage
 ```
@@ -131,6 +137,7 @@ Keep writing tests until the confirmed coverage target is reached. Focus on the 
 ### 5. Coverage in CI
 
 Add coverage flag to the test script for CI (Phase 6 will wire this):
+
 ```json
 "test:ci": "vitest run --coverage --coverage.reporter=text"
 ```

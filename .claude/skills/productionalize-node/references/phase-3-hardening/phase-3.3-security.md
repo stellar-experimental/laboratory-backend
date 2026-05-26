@@ -15,8 +15,8 @@ pnpm add helmet
 ```
 
 ```typescript
-import helmet from 'helmet'
-app.use(helmet())
+import helmet from "helmet";
+app.use(helmet());
 ```
 
 For non-Express frameworks, add equivalent headers manually or use the framework's security plugin.
@@ -30,16 +30,16 @@ pnpm add express-rate-limit
 ```
 
 ```typescript
-import rateLimit from 'express-rate-limit'
+import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100,
-  standardHeaders: 'draft-7',
+  standardHeaders: "draft-7",
   legacyHeaders: false,
-})
+});
 
-app.use(limiter)
+app.use(limiter);
 ```
 
 Consider stricter limits for auth endpoints (login, password reset).
@@ -65,10 +65,10 @@ Never import secrets directly. Pass them through configuration:
 
 ```typescript
 // Bad
-const apiKey = process.env.API_KEY // scattered across files
+const apiKey = process.env.API_KEY; // scattered across files
 
 // Good — centralized in env.ts (Phase 3.4 will formalize this)
-export const config = { apiKey: env.API_KEY }
+export const config = { apiKey: env.API_KEY };
 ```
 
 ### 5. Security checklist (inline fallback)

@@ -15,6 +15,7 @@ pnpm add zod
 ### 2. Identify validation boundaries
 
 External input enters the system through:
+
 - **API request bodies** (`req.body`)
 - **API query parameters** (`req.query`)
 - **API path parameters** (`req.params`)
@@ -29,15 +30,15 @@ List all entry points in the codebase.
 For each entry point, create a schema that validates the expected shape:
 
 ```typescript
-import { z } from 'zod'
+import { z } from "zod";
 
 export const CreateUserSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1).max(255),
-  role: z.enum(['admin', 'user']).default('user'),
-})
+  role: z.enum(["admin", "user"]).default("user"),
+});
 
-export type CreateUserInput = z.infer<typeof CreateUserSchema>
+export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 ```
 
 Place schemas near the code that uses them (colocated), or in a `schemas/` directory if the project has many.
@@ -45,26 +46,27 @@ Place schemas near the code that uses them (colocated), or in a `schemas/` direc
 ### 4. Add validation middleware (Express)
 
 ```typescript
-import type { Request, Response, NextFunction } from 'express'
-import type { ZodSchema } from 'zod'
+import type { Request, Response, NextFunction } from "express";
+import type { ZodSchema } from "zod";
 
 export function validate(schema: ZodSchema) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.body)
+    const result = schema.safeParse(req.body);
     if (!result.success) {
-      throw new ValidationError('Invalid request body', {
+      throw new ValidationError("Invalid request body", {
         issues: result.error.issues,
-      })
+      });
     }
-    req.body = result.data
-    next()
-  }
+    req.body = result.data;
+    next();
+  };
 }
 ```
 
 Apply to routes:
+
 ```typescript
-app.post('/users', validate(CreateUserSchema), createUser)
+app.post("/users", validate(CreateUserSchema), createUser);
 ```
 
 ### 5. Validate path and query params too
@@ -75,7 +77,7 @@ Don't just validate body — query params and path params are strings by default
 const PaginationSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-})
+});
 ```
 
 ### 6. Internal trust boundary

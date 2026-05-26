@@ -29,19 +29,21 @@ List every env var used, its expected type, and whether it's required or has a d
 Create `src/env.ts`:
 
 ```typescript
-import { createEnv } from '@t3-oss/env-core'
-import { z } from 'zod'
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
     PORT: z.coerce.number().default(3000),
     DATABASE_URL: z.string().url(),
     API_KEY: z.string().min(1),
-    LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+    LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
   },
   runtimeEnv: process.env,
-})
+});
 ```
 
 Adapt the schema to match the actual env vars discovered in step 2. Only include vars the application actually uses.
@@ -49,6 +51,7 @@ Adapt the schema to match the actual env vars discovered in step 2. Only include
 ### 4. Replace all process.env usage
 
 Replace every `process.env.X` with `env.X`. This gives you:
+
 - Type safety (autocomplete, compile-time errors)
 - Runtime validation (app crashes immediately with a clear error if env is misconfigured)
 - Single source of truth for all configuration

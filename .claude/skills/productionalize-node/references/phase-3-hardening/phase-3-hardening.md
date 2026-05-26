@@ -21,6 +21,7 @@ If a security review skill is available, invoke it after completing sub-phases 3
 ## Verification
 
 After all sub-phases complete:
+
 - `pnpm run check:types` passes
 - `pnpm run build` succeeds
 - Application starts and handles errors gracefully (no unhandled rejections)
