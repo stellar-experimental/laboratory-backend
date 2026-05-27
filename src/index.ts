@@ -13,6 +13,7 @@ import packageJson from "../package.json";
 import { Env } from "./config/env";
 import contractRoutes from "./routes/contract_data";
 import keysRoutes from "./routes/keys";
+import searchRoutes from "./routes/search";
 import { connect } from "./utils/connect";
 import { logger, pinoHttpOptions } from "./utils/logger";
 
@@ -67,6 +68,7 @@ app.get("/health", (_, res) => {
 
 app.use("/api", contractRoutes);
 app.use("/api", keysRoutes);
+app.use("/api", searchRoutes);
 
 // ── Error Handling ───────────────────────────────────────────────────
 
