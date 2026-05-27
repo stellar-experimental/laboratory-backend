@@ -109,11 +109,18 @@ jobs:
               open redirects, prototype pollution; risky dep additions
               (CVEs, abandoned, supply-chain); logging of PII/tokens via
               pino. Cite OWASP categories where relevant.
-            - [Docs] Documentation drift introduced by THIS PR only.
-              README still accurate for changed behavior/env vars/scripts/
-              endpoints? New env vars in `.env.example`? New pnpm scripts
-              or Makefile targets documented? Changed exported functions'
-              JSDoc still accurate? Do not propose brand-new docs pages.
+            - [Docs] Documentation drift introduced by THIS PR only. Go
+              through the diff and, for EACH of the following added in this
+              PR, flag it as a finding if it is NOT reflected in the docs:
+              * A new route/endpoint (e.g. a new `router.get/post(...)` or a
+                new file under `src/routes/`) not documented in `README.md`.
+              * A new env var (any new `process.env.X` or `Env` accessor)
+                not added to both `.env.example` AND `README.md`.
+              * A new pnpm script or Makefile target not documented.
+              * Changed exported functions whose JSDoc is now inaccurate.
+              Be concrete: name the endpoint/var and the file that should
+              have been updated. Only report "no drift" if you checked the
+              above and found nothing. Do not propose brand-new docs pages.
 
             ## How to deliver findings — ONE review
 
@@ -122,13 +129,13 @@ jobs:
                handled by linters, or anything outside the diff. Prefix
                each with its tag, e.g. `[DB] Unbounded findMany — add a
                take/limit.`
-            2. End with exactly ONE summary comment via
-               `gh pr comment ${{ github.event.pull_request.number }} --body "..."`.
-               Head it `## Claude Review`. Briefly note what you checked
-               and reference the inline counts per tag — do not repeat the
-               inline bodies.
-            3. If nothing needs changing, post only the summary with a
-               one-line "No issues found." and zero inline comments.
+            2. Do NOT post any top-level comment yourself (no `gh pr
+               comment`). Your FINAL message is the review summary — it is
+               surfaced automatically in the tracking comment. Keep it
+               brief: note what you checked and the inline counts per tag,
+               and do not repeat the inline bodies.
+            3. If nothing needs changing, make your final message a
+               one-line "No issues found." with zero inline comments.
 
             ## Rules
 
@@ -140,4 +147,4 @@ jobs:
           claude_args: |
             --model claude-haiku-4-5
             --max-turns 40
-            --allowedTools "Skill,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment ${{ github.event.pull_request.number }}:*),Bash(gh pr diff ${{ github.event.pull_request.number }}:*),Bash(gh pr view ${{ github.event.pull_request.number }}:*),Bash(git log:*),Bash(git blame:*),Bash(git show:*),Bash(rg:*),Bash(cat:*),Bash(ls:*),Bash(find:*)"
+            --allowedTools "Skill,mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff ${{ github.event.pull_request.number }}:*),Bash(gh pr view ${{ github.event.pull_request.number }}:*),Bash(git log:*),Bash(git blame:*),Bash(git show:*),Bash(rg:*),Bash(cat:*),Bash(ls:*),Bash(find:*)"
