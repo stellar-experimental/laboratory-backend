@@ -94,13 +94,13 @@ Hash index lookup is also faster (0.022 ms vs B-Tree 0.046 ms).
 
 **Limitations of hash exclusion vs B-Tree unique:**
 
-| Feature | B-Tree Unique | Hash Exclusion |
-|---------|--------------|----------------|
-| Foreign key reference | ✓ | ✗ |
-| `ON CONFLICT (column)` | ✓ | ✗ |
-| `ON CONFLICT ON CONSTRAINT` | ✓ | ✓ (DO NOTHING only) |
-| `ON CONFLICT DO UPDATE` | ✓ | ✗ |
-| `MERGE` | ✓ | ✓ |
+| Feature                     | B-Tree Unique | Hash Exclusion      |
+| --------------------------- | ------------- | ------------------- |
+| Foreign key reference       | ✓             | ✗                   |
+| `ON CONFLICT (column)`      | ✓             | ✗                   |
+| `ON CONFLICT ON CONSTRAINT` | ✓             | ✓ (DO NOTHING only) |
+| `ON CONFLICT DO UPDATE`     | ✓             | ✗                   |
+| `MERGE`                     | ✓             | ✓                   |
 
 Use `MERGE` as a workaround for upserts:
 
@@ -136,11 +136,11 @@ EXPLAIN ANALYZE SELECT * FROM users WHERE plan = 'Pro';
 -- Result: One-Time Filter: false | Execution Time: 0.008 ms
 ```
 
-| Environment | Recommendation |
-|-------------|----------------|
-| OLTP production | Leave as `'partition'` (default) |
-| BI / Data Warehouse | Set to `'on'` |
-| Ad-hoc query / reporting | Set to `'on'` |
+| Environment              | Recommendation                   |
+| ------------------------ | -------------------------------- |
+| OLTP production          | Leave as `'partition'` (default) |
+| BI / Data Warehouse      | Set to `'on'`                    |
+| Ad-hoc query / reporting | Set to `'on'`                    |
 
 **Cost:** Slight extra planning overhead evaluating constraints.
 
@@ -161,12 +161,12 @@ LIMIT 20;
 
 What to look for:
 
-| Signal | Meaning |
-|--------|---------|
-| `Seq Scan` on large table | Missing index |
-| `Nested Loop` with high row estimates | Missing join index |
-| `Sort` without `Index Scan` | In-memory/disk sort — add index |
-| `Buffers: shared hit` vs `shared read` | Cache efficiency |
+| Signal                                 | Meaning                         |
+| -------------------------------------- | ------------------------------- |
+| `Seq Scan` on large table              | Missing index                   |
+| `Nested Loop` with high row estimates  | Missing join index              |
+| `Sort` without `Index Scan`            | In-memory/disk sort — add index |
+| `Buffers: shared hit` vs `shared read` | Cache efficiency                |
 
 ---
 
@@ -239,6 +239,7 @@ Use **session-level pooling** only if the app relies on prepared statements or t
 ## 7. Diagnostic Queries
 
 **Slow queries:**
+
 ```sql
 SELECT query, calls, mean_exec_time, total_exec_time
 FROM pg_stat_statements
@@ -247,6 +248,7 @@ LIMIT 10;
 ```
 
 **Unused indexes:**
+
 ```sql
 SELECT indexrelname, idx_scan, pg_size_pretty(pg_relation_size(indexrelid))
 FROM pg_stat_user_indexes
@@ -255,6 +257,7 @@ ORDER BY pg_relation_size(indexrelid) DESC;
 ```
 
 **Compare index vs table size:**
+
 ```sql
 SELECT
     relname AS name,
@@ -265,6 +268,7 @@ ORDER BY pg_relation_size(oid) DESC;
 ```
 
 **Check constraint exclusion setting:**
+
 ```sql
 SHOW constraint_exclusion;
 ```
