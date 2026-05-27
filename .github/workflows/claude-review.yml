@@ -1,16 +1,24 @@
 # Claude PR Review
 #
 # Runs a single Claude review agent on each PR. The agent covers every
-# concern (database, TypeScript/Express, Docker, security, docs) in one
-# pass and posts ONE pull request review: inline comments only where a
-# change is actually needed, plus a single summary comment. It runs on
-# `claude-haiku-4-5` to keep cost low.
+# concern (database, TypeScript/Express, Docker, security, docs, plus an
+# optional generic pass) in one pass and posts ONE pull request review:
+# inline comments only where a change is actually needed, with the summary
+# surfaced in the track_progress tracking comment. It runs on
+# `claude-sonnet-4-6` — haiku missed too many medium-severity findings in
+# testing.
+#
+# The broader [General] pass (tests, API consistency, house conventions,
+# input-DoS) overlaps with generic bots like Copilot, so it's toggleable:
+# set the repository variable CLAUDE_REVIEW_GENERIC to "off" to skip it
+# and save tokens (default is "on"). No code change needed to flip it:
+#   gh variable set CLAUDE_REVIEW_GENERIC --body off --repo <owner>/<repo>
 #
 # Why one job (not a matrix of specialists): five parallel jobs each
 # posted their own top-level summary comment, cluttering the PR. A
-# single job with `use_sticky_comment` produces one consolidated review.
-# To re-add depth on a specific concern, extend the `## Review scope`
-# section of the prompt below rather than splitting into jobs.
+# single job produces one consolidated review. To re-add depth on a
+# specific concern, extend the `## Review scope` section of the prompt
+# below rather than splitting into jobs.
 #
 # Skills are vendored at `.claude/skills/<name>/SKILL.md`. We load
 # postgres-optimization, docker-patterns, and security-audit. TypeScript
@@ -80,7 +88,10 @@ jobs:
             and the PR metadata with `gh pr view ${{ github.event.pull_request.number }}`.
             Review only what the diff changes. Prefix every finding with a
             tag so its concern is clear: [DB], [TS], [Docker], [Security],
-            or [Docs].
+            [Docs], or [General].
+
+            GENERIC REVIEW MODE: ${{ vars.CLAUDE_REVIEW_GENERIC || 'on' }}
+            (The [General] scope below runs ONLY when this is "on".)
 
             - [DB] Database (skill: postgres-optimization). This service is
               a READ-ONLY consumer of a database owned by another repo — it
@@ -121,6 +132,24 @@ jobs:
               Be concrete: name the endpoint/var and the file that should
               have been updated. Only report "no drift" if you checked the
               above and found nothing. Do not propose brand-new docs pages.
+            - [General] Broader review quality. Runs ONLY if GENERIC REVIEW
+              MODE above is "on"; if it is "off", SKIP this entire section
+              and post zero [General] findings. When on, also check:
+              * Test coverage — new endpoints/controllers/behaviors should
+                have Jest tests (see `tests/` for the pattern); flag missing
+                coverage for new logic.
+              * API consistency — new HTTP responses should match existing
+                serializer conventions (snake_case keys, timestamp format;
+                see `src/serializers/`); flag schema drift or fields the
+                client needs but the response omits.
+              * House conventions — new env vars must go through the `Env`
+                class (`src/config/env.ts`), not raw `process.env`; new
+                routes should reuse the existing validation middleware
+                instead of hand-rolling parsing.
+              * Input-driven DoS / edge cases — empty/whitespace/oversized
+                inputs that cause full scans or unbounded work.
+              * General correctness and maintainability not covered by the
+                tagged scopes above.
 
             ## How to deliver findings — ONE review
 
@@ -145,6 +174,6 @@ jobs:
             - Be concise and high-signal — only surface things worth a
               human's time.
           claude_args: |
-            --model claude-haiku-4-5
+            --model claude-sonnet-4-6
             --max-turns 40
             --allowedTools "Skill,mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff ${{ github.event.pull_request.number }}:*),Bash(gh pr view ${{ github.event.pull_request.number }}:*),Bash(git log:*),Bash(git blame:*),Bash(git show:*),Bash(rg:*),Bash(cat:*),Bash(ls:*),Bash(find:*)"
