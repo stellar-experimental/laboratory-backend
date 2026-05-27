@@ -1,8 +1,9 @@
 # Claude PR Review
 #
 # Runs a single Claude review agent on each PR. The agent covers every
-# concern (database, TypeScript/Express, Docker, security, docs, plus an
-# optional generic pass) in one pass and posts ONE pull request review:
+# concern (database, TypeScript/Express, Docker, security, docs, test
+# coverage, plus an optional generic pass) in one pass and posts ONE
+# pull request review:
 # inline comments only where a change is actually needed, with the summary
 # surfaced in the track_progress tracking comment. It runs on
 # `claude-sonnet-4-6` — haiku missed too many medium-severity findings in
@@ -88,7 +89,7 @@ jobs:
             and the PR metadata with `gh pr view ${{ github.event.pull_request.number }}`.
             Review only what the diff changes. Prefix every finding with a
             tag so its concern is clear: [DB], [TS], [Docker], [Security],
-            [Docs], or [General].
+            [Docs], [Tests], or [General].
 
             GENERIC REVIEW MODE: ${{ vars.CLAUDE_REVIEW_GENERIC || 'on' }}
             (The [General] scope below runs ONLY when this is "on".)
@@ -132,12 +133,20 @@ jobs:
               Be concrete: name the endpoint/var and the file that should
               have been updated. Only report "no drift" if you checked the
               above and found nothing. Do not propose brand-new docs pages.
+            - [Tests] Test coverage (ALWAYS on, regardless of generic mode —
+              cheap to check, high value). Tests use jest and live under
+              `tests/` mirroring `src/` (e.g. `src/controllers/x.ts` ->
+              `tests/controllers/x.test.ts`). For every new or substantially
+              changed unit of logic in this PR (controllers, routes,
+              query-builders, serializers, helpers, env/config), check
+              whether a matching test exists or was added in the diff. Flag
+              new logic shipped without tests: name the exact test file that
+              should exist and the key cases to cover (happy path + the edge
+              cases you found, e.g. empty/invalid input, ordering, the cap).
+              Trivial pass-throughs and pure wiring don't need tests.
             - [General] Broader review quality. Runs ONLY if GENERIC REVIEW
               MODE above is "on"; if it is "off", SKIP this entire section
               and post zero [General] findings. When on, also check:
-              * Test coverage — new endpoints/controllers/behaviors should
-                have Jest tests (see `tests/` for the pattern); flag missing
-                coverage for new logic.
               * API consistency — new HTTP responses should match existing
                 serializer conventions (snake_case keys, timestamp format;
                 see `src/serializers/`); flag schema drift or fields the
@@ -156,8 +165,8 @@ jobs:
             1. Post an inline comment ONLY where the diff requires a
                change. No inline comments for praise, nitpicks already
                handled by linters, or anything outside the diff. Prefix
-               each with its tag, e.g. `[DB] Unbounded findMany — add a
-               take/limit.`
+               each with its tag and severity, e.g. `[DB][High] Unbounded
+               findMany — add a take/limit.`
             2. Do NOT post any top-level comment yourself (no `gh pr
                comment`). Your FINAL message is the review summary — it is
                surfaced automatically in the tracking comment. Keep it
@@ -169,6 +178,20 @@ jobs:
             ## Rules
 
             - Cite file:line for every claim. No vague advice.
+            - Start each finding with a severity in brackets after the tag:
+              `[Security][Critical]`, `[High]`, `[Medium]`, or `[Low]`.
+            - When the fix is small and localized, include a GitHub
+              ```suggestion block so it's one-click committable.
+            - Prefer reusing what already exists. Before recommending new
+              code, grep `src/` for an existing util/pattern/serializer/
+              middleware and point to it — this repo has strong conventions.
+            - Ignore generated and non-source files: `generated/`, `dist/`,
+              `node_modules/`, `pnpm-lock.yaml`, and `.claude/`.
+            - Control noise: don't stack many `[Low]` inline comments. Cap
+              inline comments at the issues that genuinely need a change;
+              roll minor/optional items into the final summary instead.
+            - Calibrate confidence: if something might be intentional, ask a
+              question rather than asserting a defect. No false alarms.
             - Pass the PR number explicitly to `gh` commands; don't rely
               on cwd.
             - Be concise and high-signal — only surface things worth a
